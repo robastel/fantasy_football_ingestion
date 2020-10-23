@@ -1,19 +1,17 @@
-import logging
-import sys
-import argparse
+from src.utils import get_logger, parse_args
+from src.sleeper import Season, User
 
-from src.sleeper import Season
+logger = get_logger('Fantasy Football Stats')
+args_config = [
+    {
+        'definition': ['-s', '--sleeper'],
+        'params': {
+            'help': 'Most recent Sleeper season league ID'
+        }
+    }
+]
+args = parse_args(args_config)
 
-logger = logging.getLogger('Fantasy Football Stats')
-handler = logging.StreamHandler(stream=sys.stdout)
-formatter = logging.Formatter('{name} [{levelname}]:: {message}', style='{')
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-logger.setLevel('INFO')
-
-ap = argparse.ArgumentParser()
-ap.add_argument('-s', '--sleeper', help='Most recent Sleeper season league ID')
-args = vars(ap.parse_args())
 
 if __name__ == '__main__':
     seasons = list()
