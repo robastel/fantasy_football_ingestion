@@ -22,7 +22,8 @@ class Season:
         self.playoff_start_week = None
         self.last_completed_week = None
         self.matchup_against_median_setting = None
-        self.matchup_dfs = dict()
+        self.matchups_h2h = None
+        self.matchups_median = None
         self.draft = None
         self.rosters = None
         self.roster_to_display_name_map = None
@@ -33,6 +34,8 @@ class Season:
         self.get_settings()
         self.get_draft()
         self.get_rosters()
+        self.get_users()
+        self.get_all_completed_matchups()
 
     def get_season(self):
         url = f'{BASE_URL}/league/{self.season_id}'
@@ -46,48 +49,62 @@ class Season:
 
     def get_draft(self):
         self.draft = Draft(self.season['draft_id'])
-        self.draft.get_draft_picks()
+        self.draft.get_picks()
 
     def get_rosters(self):
         url = f'{BASE_URL}/league/{self.season_id}/rosters'
         rosters = api_get_request(url)
-        roster_to_user_map = {r['roster_id']: r['owner_id'] for r in rosters}
-        self.get_users()
-        user_to_display_name_map = {u['user_id']: u['display_name'] for u in self.users}
-        self.roster_to_display_name_map = {
-            r['roster_id']: user_to_display_name_map[roster_to_user_map[r['roster_id']]]
-            for r in rosters
-        }
-        for r in rosters:
-            r['manager_display_name'] = user_to_display_name_map[roster_to_user_map[r['roster_id']]]
-        self.rosters = rosters
+        keys = ['roster_id', 'owner_id']
+        rosters = [
+            {
+                **{k: roster.get(k) or None for k in keys},
+                'season_id': self.season_id,
+                'year': self.season['season']
+            }
+            for roster in rosters
+        ]
+        self.rosters = pd.DataFrame(rosters)
 
     def get_users(self):
         url = f'{BASE_URL}/league/{self.season_id}/users'
-        self.users = api_get_request(url)
+        users = api_get_request(url)
+        keys = ['user_id', 'display_name']
+        users = [
+            {
+                **{k: user.get(k) or None for k in keys},
+                'season_id': self.season_id,
+                'year': self.season['season'],
+            }
+            for user in users
+        ]
+        self.users = pd.DataFrame(users)
 
     def get_all_completed_matchups(self):
         self._get_winners_bracket()
+        matchups_h2h = list()
+        matchups_median = list()
         for week in range(self.start_week, self.last_completed_week+1):
-            week_matchups = self._get_week_matchups(week)
-            for k, v in week_matchups.items():
-                self.matchup_dfs[k] = pd.concat([self.matchup_dfs.get(k), v])
-        for k, v in self.matchup_dfs.items():
-            self.matchup_dfs[k] = v.reset_index(drop=True)
+            week_matchups_h2h, week_matchups_median = self._get_week_matchups(week)
+            matchups_h2h.append(week_matchups_h2h)
+            matchups_median.append(week_matchups_median)
+        self.matchups_h2h = pd.concat(matchups_h2h, ignore_index=True)
+        self.matchups_median = pd.concat(matchups_median, ignore_index=True)
 
     def _get_week_matchups(self, week):
         url = f'{self.base_url}/league/{self.season_id}/matchups/{week}'
         week_matchups = api_get_request(url)
         week_matchups = self._filter_week_matchups(week, week_matchups)
-        week_matchups_h2h_df = self._get_week_matchups_h2h(week_matchups)
-        week_matchups_median_df = self._get_week_matchups_median(week, week_matchups)
-        return {'h2h': week_matchups_h2h_df, 'median': week_matchups_median_df}
+        week_matchups_h2h = self._get_week_matchups_h2h(week_matchups)
+        week_matchups_median = self._get_week_matchups_median(week, week_matchups)
+        return week_matchups_h2h, week_matchups_median
 
     def _filter_week_matchups(self, week, matchups):
         matchups = [
             {
-                'week': week,
                 'matchup_id': m['matchup_id'],
+                'season_id': self.season_id,
+                'year': self.season['season'],
+                'week': week,
                 'roster_id': m['roster_id'],
                 'points': round(m['custom_points'] or m['points'], 2),
                 'type': matchup_type
@@ -115,6 +132,8 @@ class Season:
             week_median = round(median([m['points'] for m in matchups]), 2)
             median_matchups = [
                 {
+                    'season_id': self.season_id,
+                    'year': self.season['season'],
                     'week': m['week'],
                     'roster_id': m['roster_id'],
                     'points': m['points'],
@@ -175,21 +194,21 @@ class Season:
         return matchup_type
 
 
-class User:
-    def __init__(self, user_id):
-        self.user_id = user_id
-        self.user = None
-
-    def get_user(self):
-        url = f'{BASE_URL}/user/{self.user_id}'
-        self.user = api_get_request(url)
-
-
 class Draft:
     def __init__(self, draft_id):
         self.draft_id = draft_id
-        self.draft_picks = None
+        self.picks = None
 
-    def get_draft_picks(self):
-        self.draft_picks = api_get_request(f'{BASE_URL}/draft/{self.draft_id}/picks')
-
+    def get_picks(self):
+        url = f'{BASE_URL}/draft/{self.draft_id}/picks'
+        picks = api_get_request(url)
+        keys = ['draft_id', 'pick_no', 'round', 'draft_slot', 'player_id', 'roster_id', 'picked_by', 'is_keeper']
+        metadata_keys = ['years_exp', 'team', 'status', 'position', 'first_name', 'last_name', 'injury_status']
+        picks = [
+            {
+                **{k: pick.get(k) or None for k in keys},
+                **{k: pick['metadata'].get(k) or None for k in metadata_keys}
+            }
+            for pick in picks
+        ]
+        self.picks = pd.DataFrame(picks).fillna(pd.NA)
