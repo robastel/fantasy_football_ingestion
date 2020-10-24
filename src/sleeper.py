@@ -35,7 +35,7 @@ class Season:
         self.get_draft()
         self.get_rosters()
         self.get_users()
-        self.get_all_completed_matchups()
+        # self.get_all_completed_matchups()
 
     def get_season(self):
         url = f'{BASE_URL}/league/{self.season_id}'
@@ -58,8 +58,7 @@ class Season:
         rosters = [
             {
                 **{k: roster.get(k) or None for k in keys},
-                'season_id': self.season_id,
-                'year': self.season['season']
+                'season_id': self.season_id
             }
             for roster in rosters
         ]
@@ -69,14 +68,7 @@ class Season:
         url = f'{BASE_URL}/league/{self.season_id}/users'
         users = api_get_request(url)
         keys = ['user_id', 'display_name']
-        users = [
-            {
-                **{k: user.get(k) or None for k in keys},
-                'season_id': self.season_id,
-                'year': self.season['season'],
-            }
-            for user in users
-        ]
+        users = [{k: user.get(k) or None for k in keys} for user in users]
         self.users = pd.DataFrame(users)
 
     def get_all_completed_matchups(self):
@@ -103,7 +95,6 @@ class Season:
             {
                 'matchup_id': m['matchup_id'],
                 'season_id': self.season_id,
-                'year': self.season['season'],
                 'week': week,
                 'roster_id': m['roster_id'],
                 'points': round(m['custom_points'] or m['points'], 2),
@@ -133,7 +124,6 @@ class Season:
             median_matchups = [
                 {
                     'season_id': self.season_id,
-                    'year': self.season['season'],
                     'week': m['week'],
                     'roster_id': m['roster_id'],
                     'points': m['points'],
@@ -212,3 +202,6 @@ class Draft:
             for pick in picks
         ]
         self.picks = pd.DataFrame(picks).fillna(pd.NA)
+
+
+# TODO: create seasons table with year
