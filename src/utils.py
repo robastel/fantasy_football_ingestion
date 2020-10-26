@@ -3,24 +3,7 @@ import json
 import sys
 import logging
 import argparse
-
-def api_get_request(url):
-    response = requests.get(url)
-    response.raise_for_status()
-    text = json.loads(response.text)
-    return text
-
-
-def get_logger(name, stream=sys.stdout, style='{', frmt='{name} [{levelname}]:: {message}', level='INFO'):
-    logger = logging.getLogger(name)
-    if logger.hasHandlers():
-        logger.handlers.clear()
-    handler = logging.StreamHandler(stream=stream)
-    formatter = logging.Formatter(frmt, style=style)
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
-    logger.setLevel(level.upper())
-    return logger
+import yaml
 
 
 def parse_args(args):
@@ -55,3 +38,36 @@ def parse_args(args):
         else:
             ap.add_argument(item['definition'], **item['params'])
     return vars(ap.parse_args())
+
+
+def parse_yaml(file_path):
+    """
+    Parses a yaml file
+    :param file_path: Path of the yaml file to parse
+    :return: The parsed yaml file
+    """
+    with open(file_path, 'r') as stream:
+        try:
+            parsed_yaml = yaml.safe_load(stream)
+            return parsed_yaml
+        except yaml.YAMLError as exc:
+            sys.exit(exc)
+
+
+def get_logger(name, stream=sys.stdout, style='{', frmt='{name} [{levelname}]:: {message}', level='INFO'):
+    logger = logging.getLogger(name)
+    if logger.hasHandlers():
+        logger.handlers.clear()
+    handler = logging.StreamHandler(stream=stream)
+    formatter = logging.Formatter(frmt, style=style)
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    logger.setLevel(level.upper())
+    return logger
+
+
+def api_get_request(url):
+    response = requests.get(url)
+    response.raise_for_status()
+    response_text = json.loads(response.text)
+    return response_text

@@ -1,0 +1,60 @@
+sleeper:
+  base_url: https://api.sleeper.app/v1
+  tables:
+    seasons:
+      method: get_season
+      key_map:
+        league_id: season_id
+        season: year
+        draft_id:
+        previous_league_id: previous_season_id
+        settings:
+          start_week:
+          playoff_week_start: playoff_start_week
+          last_scored_leg: last_completed_week
+          league_average_match: has_matchup_against_median
+    draft_picks:
+      method: get_draft_picks
+      key_map:
+        draft_id: draft_id
+        pick_no: pick_num
+        round: round_num
+        draft_slot:
+        player_id:
+        roster_id:
+        picked_by: user_id
+        is_keeper:
+        metadata:
+          first_name:
+          last_name:
+          position:
+          team:
+          years_exp:
+          status:
+          injury_status:
+    rosters:
+      method: get_rosters
+      key_map:
+        roster_id: roster_id
+        owner_id: user_id
+    lookup_playoffs:
+      method: get_winners_bracket
+      key_map:
+        r: bracket_round
+        p: winner_place
+        t1: roster_id_a
+        t2: roster_id_b
+        w: roster_id_winner
+        l: roster_id_loser
+    matchups:
+      method: get_matchups
+      key_map:
+        matchup_id:
+        roster_id:
+        points:
+        custom_points:
+    user_seasons:
+      method: get_users
+      key_map:
+        user_id:
+        display_name:
