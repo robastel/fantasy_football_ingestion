@@ -58,3 +58,31 @@ sleeper:
       key_map:
         user_id:
         display_name:
+
+espn:
+  years:
+    start: 2013
+    end: 2018
+  tables:
+    seasons:
+      method: get_season
+      key_map:
+        league_id:
+        year:
+        firstScoringPeriod: start_week
+        currentMatchupPeriod: current_week
+        settings:
+          reg_season_count: regular_season_weeks
+          team_count:
+          playoff_team_count:
+    draft_picks:
+      method: get_draft_picks
+      key_map:
+          playerId: player_id
+          playerName: player_name
+          round_num:
+          round_pick:
+          bid_amount:
+          keeper_status: is_keeper
+          team:
+            team_id:

@@ -71,3 +71,30 @@ def api_get_request(url):
     response.raise_for_status()
     response_text = json.loads(response.text)
     return response_text
+
+
+def format_response(response, key_map):
+    if isinstance(response, dict):
+        formatted_response = _format_record(response, key_map)
+    else:
+        formatted_response = list()
+        for record in response:
+            formatted_record = _format_record(record, key_map)
+            formatted_response.append(formatted_record)
+    return formatted_response
+
+
+def _format_record(record, key_map):
+    formatted_record = dict()
+    for k, v in key_map.items():
+        if record.get(k):
+            _format_key(record, k, v, formatted_record)
+    return formatted_record
+
+
+def _format_key(record, key, value, formatted_record):
+    if isinstance((sub_record := record[key]), dict):
+        for sub_key, sub_value in value.items():
+            _format_key(sub_record, sub_key, sub_value, formatted_record)
+    else:
+        formatted_record[value or key] = record.get(key)

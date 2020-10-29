@@ -1,6 +1,6 @@
 import pandas as pd
 
-from src.utils import api_get_request
+from src.utils import api_get_request, format_response
 
 BASE_URL = 'https://api.sleeper.app/v1'
 
@@ -36,7 +36,7 @@ class Season:
         self.start_week = settings.get('start_week')
         self.playoff_start_week = settings.get('playoff_week_start')
         if key_map:
-            response = self._format_response(response, key_map)
+            response = format_response(response, key_map)
         self.season = pd.DataFrame([response])
         return self.season
 
@@ -44,7 +44,7 @@ class Season:
         url = f'{self.base_url}/draft/{self.draft_id}/picks'
         response = api_get_request(url)
         if key_map:
-            response = self._format_response(response, key_map)
+            response = format_response(response, key_map)
         draft_picks = pd.DataFrame(response)
         draft_picks['season_id'] = self.season_id
         self.draft_picks = draft_picks
@@ -54,7 +54,7 @@ class Season:
         url = f'{self.base_url}/league/{self.season_id}/rosters'
         response = api_get_request(url)
         if key_map:
-            response = self._format_response(response, key_map)
+            response = format_response(response, key_map)
         self.rosters = pd.DataFrame(response)
         return self.rosters
 
@@ -63,7 +63,7 @@ class Season:
         response = api_get_request(url)
         self.playoff_rounds_count = max([matchup['r'] for matchup in response])
         if key_map:
-            response = self._format_response(response, key_map)
+            response = format_response(response, key_map)
         winners_bracket = pd.DataFrame(response)
         winners_bracket['season_id'] = self.season_id
         self.winners_bracket = winners_bracket
@@ -75,7 +75,7 @@ class Season:
             url = f'{self.base_url}/league/{self.season_id}/matchups/{week}'
             response = api_get_request(url)
             if key_map:
-                response = self._format_response(response, key_map)
+                response = format_response(response, key_map)
             week_matchups = pd.DataFrame(response)
             week_matchups['season_id'] = self.season_id
             all_matchups.append(pd.DataFrame(week_matchups))
@@ -86,32 +86,32 @@ class Season:
         url = f'{self.base_url}/league/{self.season_id}/users'
         response = api_get_request(url)
         if key_map:
-            response = self._format_response(response, key_map)
+            response = format_response(response, key_map)
         users = pd.DataFrame(response)
         users['season_id'] = self.season_id
         self.users = users
         return self.users
 
-    def _format_response(self, response, key_map):
-        if isinstance(response, dict):
-            formatted_response = self._format_record(response, key_map)
-        else:
-            formatted_response = list()
-            for record in response:
-                formatted_record = self._format_record(record, key_map)
-                formatted_response.append(formatted_record)
-        return formatted_response
-
-    def _format_record(self, record, key_map):
-        formatted_record = dict()
-        for k, v in key_map.items():
-            if record.get(k):
-                self._format_key(record, k, v, formatted_record)
-        return formatted_record
-
-    def _format_key(self, record, key, value, formatted_record):
-        if isinstance((sub_record := record[key]), dict):
-            for sub_key, sub_value in value.items():
-                self._format_key(sub_record, sub_key, sub_value, formatted_record)
-        else:
-            formatted_record[value or key] = record.get(key)
+    # def _format_response(self, response, key_map):
+    #     if isinstance(response, dict):
+    #         formatted_response = self._format_record(response, key_map)
+    #     else:
+    #         formatted_response = list()
+    #         for record in response:
+    #             formatted_record = self._format_record(record, key_map)
+    #             formatted_response.append(formatted_record)
+    #     return formatted_response
+    #
+    # def _format_record(self, record, key_map):
+    #     formatted_record = dict()
+    #     for k, v in key_map.items():
+    #         if record.get(k):
+    #             self._format_key(record, k, v, formatted_record)
+    #     return formatted_record
+    #
+    # def _format_key(self, record, key, value, formatted_record):
+    #     if isinstance((sub_record := record[key]), dict):
+    #         for sub_key, sub_value in value.items():
+    #             self._format_key(sub_record, sub_key, sub_value, formatted_record)
+    #     else:
+    #         formatted_record[value or key] = record.get(key)
