@@ -7,6 +7,13 @@ from src.utils import format_response
 
 class ESPNSeason:
     def __init__(self, league_id, s2, swid, year):
+        """
+        Initialize the ESPNSeason class
+        :param league_id: The ESPN league ID for which this season is a part of
+        :param s2: Your ESPN s2 cookie (used for authentication)
+        :param swid: Your ESPN swid cookie (used for authentication)
+        :param year: The year of the season
+        """
         self.league_id = league_id
         self.s2 = s2
         self.swid = swid
@@ -21,6 +28,11 @@ class ESPNSeason:
         self.matchups = None
 
     def get_season(self, key_map=None):
+        """
+        Request a season from ESPN
+        :param key_map: A dictionary representing the values to be parsed from the API response
+        :return: A DataFrame representing the season
+        """
         response = League(league_id=self.league_id, year=self.year, espn_s2=self.s2, swid=self.swid)
         response = vars(response)
         response['settings'] = vars(response['settings'])
@@ -35,6 +47,11 @@ class ESPNSeason:
         return self.season
 
     def get_draft_picks(self, key_map=None):
+        """
+        Parse the draft picks for the season
+        :param key_map: A dictionary representing the values to be parsed from the raw draft picks data
+        :return: A DataFrame representing the draft picks
+        """
         for pick in self.draft_picks:
             pick['team'] = vars(pick['team'])
         if key_map:
@@ -44,13 +61,22 @@ class ESPNSeason:
         return self.draft_picks
 
     def get_teams(self, key_map=None):
+        """
+        Parse the teams for the season
+        :param key_map: A dictionary representing the values to be parsed from the raw teams data
+        :return: A DataFrame representing the teams
+        """
         if key_map:
             self.teams = format_response(self.team_objs, key_map)
         self.teams = pd.DataFrame(self.teams)
         self.teams['year'] = self.year
         return self.teams
 
-    def get_matchups(self, key_map=None):
+    def get_matchups(self, **kwargs):
+        """
+        Parse the matchups for the season
+        :return: A DataFrame representing the matchups
+        """
         matchups = list()
         for team in self.team_objs:
             team['schedule'] = [opponent.team_id for opponent in team['schedule']]

@@ -53,7 +53,7 @@ args_config = [
         'definition': ['-l', '--log-level'],
         'params': {
             'default': 'INFO',
-            'help': 'A python logging level (DEBUG, INFO, WARN, ERROR, CRITICAL)'
+            'help': 'A python logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)'
         }
     }
 ]
@@ -89,6 +89,19 @@ dfs = {
 
 
 def build_season_dfs(season_obj, tables_config, dfs_dict):
+    """
+    Helper function to build and collect all the dataframes necessary for each season
+    :param season_obj: A SleeperSeason or ESPNSeason object
+    :param tables_config: A configuration dictionary containing a dictionary of tables for which to build DataFrames.
+                          Each key is a table name and has a nested dictionary as its value.
+                          Each nested dictionary contains a 'method' key to denote which method of season_obj to run.
+                          Each nested dictionary may also contains a 'key_map' key that is used to filter, flatten, and
+                          rename the the values in each record from the API response.  See src.utils.format_response()
+                          for more details.
+    :param dfs_dict: A dictionary where the keys are table names and the values are lists of DataFrames.
+                     Each list of DataFrames will later be concatenated before upload to the corresponding table name.
+    :return: None
+    """
     for table_name, table_config in tables_config.items():
         method_name = table_config['method']
         method = season_obj.__getattribute__(method_name)
@@ -96,17 +109,17 @@ def build_season_dfs(season_obj, tables_config, dfs_dict):
 
 
 if __name__ == '__main__':
-    # Sleeper
+    # Get Sleeper seasons
     season = SleeperSeason(sleeper_season_id, base_url=sleeper_base_url)
     while season.season_id:
         build_season_dfs(season, sleeper_tables_config, dfs)
-        logger.info(f'Got season {season.season["year"].iloc[0]} from Sleeper')
+        logger.info(f'Got the {season.season["year"].iloc[0]} season from Sleeper')
         season = SleeperSeason(season.previous_season_id)
-    # ESPN
+    # Get ESPN seasons
     for year in range(espn_end_year, espn_start_year-1, -1):
         season = ESPNSeason(espn_league_id, espn_s2, espn_swid, year)
         build_season_dfs(season, espn_tables_config, dfs)
-        logger.info(f'Got season {year} from ESPN')
+        logger.info(f'Got the {year} season from ESPN')
     # Upload to BigQuery
     for table, data in dfs.items():
         df = pd.concat(data, ignore_index=True)
