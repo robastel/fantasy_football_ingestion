@@ -1,2 +1,2 @@
 # fantasy-football-stats
-Statistics and analysis for fantasy football leagues
+This is the home of the data pipeline, analysis, and predictions for my fantasy football league.

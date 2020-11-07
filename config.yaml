@@ -1,0 +1,101 @@
+sleeper:
+  base_url: https://api.sleeper.app/v1
+  tables:
+    sleeper_seasons:
+      method: get_season
+      key_map:
+        league_id: season_id
+        season: year
+        draft_id:
+        previous_league_id: previous_season_id
+        settings:
+          start_week:
+          playoff_week_start: playoff_start_week
+          last_scored_leg: last_completed_week
+          league_average_match: has_matchup_against_median
+    sleeper_draft_picks:
+      method: get_draft_picks
+      key_map:
+        draft_id: draft_id
+        pick_no: pick_num
+        round: round_num
+        draft_slot:
+        player_id:
+        roster_id:
+        picked_by: user_id
+        is_keeper:
+        metadata:
+          first_name:
+          last_name:
+          position:
+          team:
+          years_exp:
+          status:
+          injury_status:
+    sleeper_rosters:
+      method: get_rosters
+      key_map:
+        roster_id: roster_id
+        owner_id: user_id
+    sleeper_lookup_playoffs:
+      method: get_winners_bracket
+      key_map:
+        r: bracket_round
+        p: winner_place
+        t1: roster_id_a
+        t2: roster_id_b
+        w: roster_id_winner
+        l: roster_id_loser
+    sleeper_matchups:
+      method: get_matchups
+      key_map:
+        matchup_id:
+        roster_id:
+        points:
+        custom_points:
+    sleeper_user_seasons:
+      method: get_users
+      key_map:
+        user_id:
+        display_name:
+
+espn:
+  years:
+    start: 2013
+    end: 2018
+  tables:
+    espn_seasons:
+      method: get_season
+      key_map:
+        league_id:
+        year:
+        firstScoringPeriod: start_week
+        currentMatchupPeriod: current_week
+        settings:
+          reg_season_count: regular_season_weeks
+          team_count:
+          playoff_team_count:
+    espn_draft_picks:
+      method: get_draft_picks
+      key_map:
+          playerId: player_id
+          playerName: player_name
+          round_num:
+          round_pick:
+          bid_amount:
+          keeper_status: is_keeper
+          team:
+            team_id:
+    espn_teams:
+      method: get_teams
+      key_map:
+        team_id:
+        owner: manager
+        wins:
+        losses:
+        standing:
+        final_standing:
+        points_for: points_regular_season
+        points_against: points_against_regular_season
+    espn_matchups:
+      method: get_matchups
