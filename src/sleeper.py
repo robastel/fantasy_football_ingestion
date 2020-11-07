@@ -5,7 +5,7 @@ from src.utils import api_get_request, format_response
 BASE_URL = 'https://api.sleeper.app/v1'
 
 
-class Season:
+class SleeperSeason:
     def __init__(self, season_id, base_url=BASE_URL):
         """
         Initialize the Sleeper class
@@ -78,6 +78,7 @@ class Season:
                 response = format_response(response, key_map)
             week_matchups = pd.DataFrame(response)
             week_matchups['season_id'] = self.season_id
+            week_matchups['week'] = week
             all_matchups.append(pd.DataFrame(week_matchups))
         self.matchups = pd.concat(all_matchups, ignore_index=True)
         return self.matchups

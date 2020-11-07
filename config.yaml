@@ -1,7 +1,7 @@
 sleeper:
   base_url: https://api.sleeper.app/v1
   tables:
-    seasons:
+    sleeper_seasons:
       method: get_season
       key_map:
         league_id: season_id
@@ -13,7 +13,7 @@ sleeper:
           playoff_week_start: playoff_start_week
           last_scored_leg: last_completed_week
           league_average_match: has_matchup_against_median
-    draft_picks:
+    sleeper_draft_picks:
       method: get_draft_picks
       key_map:
         draft_id: draft_id
@@ -32,12 +32,12 @@ sleeper:
           years_exp:
           status:
           injury_status:
-    rosters:
+    sleeper_rosters:
       method: get_rosters
       key_map:
         roster_id: roster_id
         owner_id: user_id
-    lookup_playoffs:
+    sleeper_lookup_playoffs:
       method: get_winners_bracket
       key_map:
         r: bracket_round
@@ -46,14 +46,14 @@ sleeper:
         t2: roster_id_b
         w: roster_id_winner
         l: roster_id_loser
-    matchups:
+    sleeper_matchups:
       method: get_matchups
       key_map:
         matchup_id:
         roster_id:
         points:
         custom_points:
-    user_seasons:
+    sleeper_user_seasons:
       method: get_users
       key_map:
         user_id:
@@ -64,7 +64,7 @@ espn:
     start: 2013
     end: 2018
   tables:
-    seasons:
+    espn_seasons:
       method: get_season
       key_map:
         league_id:
@@ -75,7 +75,7 @@ espn:
           reg_season_count: regular_season_weeks
           team_count:
           playoff_team_count:
-    draft_picks:
+    espn_draft_picks:
       method: get_draft_picks
       key_map:
           playerId: player_id
@@ -86,3 +86,16 @@ espn:
           keeper_status: is_keeper
           team:
             team_id:
+    espn_teams:
+      method: get_teams
+      key_map:
+        team_id:
+        owner: manager
+        wins:
+        losses:
+        standing:
+        final_standing:
+        points_for: points_regular_season
+        points_against: points_against_regular_season
+    espn_matchups:
+      method: get_matchups
