@@ -71,7 +71,9 @@ class SleeperSeason:
         response = api_get_request(url)
         if key_map:
             response = format_response(response, key_map)
-        self.rosters = pd.DataFrame(response)
+        rosters = pd.DataFrame(response)
+        rosters['season_id'] = self.season_id
+        self.rosters = rosters
         return self.rosters
 
     def get_winners_bracket(self, key_map=None):

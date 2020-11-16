@@ -4,60 +4,127 @@ sleeper:
     sleeper_seasons:
       method: get_season
       key_map:
-        league_id: season_id
-        season: year
+        league_id:
+          data_type: STRING
+          col_name: season_id
+        season:
+          data_type: INT64
+          col_name: year
         draft_id:
-        previous_league_id: previous_season_id
+          data_type: STRING
+        previous_league_id:
+          data_type: STRING
+          col_name: previous_season_id
         settings:
           start_week:
-          playoff_week_start: playoff_start_week
-          last_scored_leg: last_completed_week
-          league_average_match: has_matchup_against_median
+            data_type: INT64
+          playoff_week_start:
+            data_type: INT64
+            col_name: playoff_start_week
+          last_scored_leg:
+            data_type: INT64
+            col_name: last_completed_week
+          league_average_match:
+            data_type: BOOL
+            col_name: has_matchup_against_median
     sleeper_draft_picks:
       method: get_draft_picks
       key_map:
-        draft_id: draft_id
-        pick_no: pick_num
-        round: round_num
+        season_id:
+          data_type: STRING
+        draft_id:
+          data_type: STRING
+          col_name: draft_id
+        pick_no:
+          data_type: INT64
+          col_name: pick_num
+        round:
+          data_type: INT64
+          col_name: round_num
         draft_slot:
+          data_type: INT64
         player_id:
+          data_type: STRING
         roster_id:
-        picked_by: user_id
+          data_type: INT64
+        picked_by:
+          data_type: STRING
+          col_name: user_id
         is_keeper:
+          data_type: BOOL
         metadata:
           first_name:
+            data_type: STRING
           last_name:
+            data_type: STRING
           position:
+            data_type: STRING
           team:
+            data_type: STRING
           years_exp:
+            data_type: INT64
           status:
+            data_type: STRING
           injury_status:
+            data_type: STRING
     sleeper_rosters:
       method: get_rosters
       key_map:
-        roster_id: roster_id
-        owner_id: user_id
+        season_id:
+          data_type: STRING
+        roster_id:
+          data_type: INT64
+          col_name: roster_id
+        owner_id:
+          data_type: STRING
+          col_name: user_id
     sleeper_lookup_playoffs:
       method: get_winners_bracket
       key_map:
-        r: bracket_round
-        p: winner_place
-        t1: roster_id_a
-        t2: roster_id_b
-        w: roster_id_winner
-        l: roster_id_loser
+        season_id:
+          data_type: STRING
+        r:
+          data_type: INT64
+          col_name: bracket_round
+        p:
+          data_type: INT64
+          col_name: winner_place
+        t1:
+          data_type: INT64
+          col_name: roster_id_a
+        t2:
+          data_type: INT64
+          col_name: roster_id_b
+        w:
+          data_type: INT64
+          col_name: roster_id_winner
+        l:
+          data_type: INT64
+          col_name: roster_id_loser
     sleeper_matchups:
       method: get_matchups
       key_map:
+        season_id:
+          data_type: STRING
+        week:
+          data_type: INT64
         matchup_id:
+          data_type: INT64
         roster_id:
+          data_type: INT64
         points:
+          data_type: FLOAT64
         custom_points:
+          data_type: FLOAT64
     sleeper_user_seasons:
       method: get_users
       key_map:
+        season_id:
+          data_type: STRING
         user_id:
+          data_type: STRING
         display_name:
+          data_type: STRING
 
 espn:
   years:
@@ -68,34 +135,83 @@ espn:
       method: get_season
       key_map:
         league_id:
+          data_type: STRING
         year:
-        firstScoringPeriod: start_week
-        currentMatchupPeriod: current_week
+          data_type: INT64
+        firstScoringPeriod:
+          data_type: INT64
+          col_name: start_week
+        currentMatchupPeriod:
+          data_type: INT64
+          col_name: current_week
         settings:
-          reg_season_count: regular_season_weeks
+          reg_season_count:
+            data_type: INT64
+            col_name: regular_season_weeks
           team_count:
+            data_type: INT64
           playoff_team_count:
+            data_type: INT64
     espn_draft_picks:
       method: get_draft_picks
       key_map:
-          playerId: player_id
-          playerName: player_name
-          round_num:
-          round_pick:
-          bid_amount:
-          keeper_status: is_keeper
-          team:
-            team_id:
+        year:
+          data_type: INT64
+        playerId:
+          data_type: STRING
+          col_name: player_id
+        playerName:
+          data_type: STRING
+          col_name: player_name
+        round_num:
+          data_type: INT64
+        round_pick:
+          data_type: INT64
+        bid_amount:
+          data_type: INT64
+        keeper_status:
+          data_type: BOOL
+          col_name: is_keeper
+        team:
+          team_id:
+            data_type: INT64
     espn_teams:
       method: get_teams
       key_map:
+        year:
+          data_type: INT64
         team_id:
-        owner: manager
+          data_type: INT64
+        owner:
+          data_type: STRING
+          col_name: manager
         wins:
+          data_type: INT64
         losses:
+          data_type: INT64
         standing:
+          data_type: INT64
         final_standing:
-        points_for: points_regular_season
-        points_against: points_against_regular_season
+          data_type: INT64
+        points_for:
+          data_type: FLOAT64
+          col_name: points_regular_season
+        points_against:
+          data_type: FLOAT64
+          col_name: points_against_regular_season
     espn_matchups:
       method: get_matchups
+      key_map:
+        year:
+          data_type: INT64
+        team_id:
+          data_type: INT64
+        schedule:
+          col_name: opponent_ids
+          data_type: ARRAY<INT64>
+        scores:
+          data_type: ARRAY<FLOAT64>
+          col_name: points
+        mov:
+          data_type: ARRAY<FLOAT64>
+          col_name: margins_of_victory

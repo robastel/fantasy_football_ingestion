@@ -72,22 +72,17 @@ class ESPNSeason:
         self.teams['year'] = self.year
         return self.teams
 
-    def get_matchups(self, **kwargs):
+    def get_matchups(self, key_map=None):
         """
         Parse the matchups for the season
         :return: A DataFrame representing the matchups
         """
         matchups = list()
         for team in self.team_objs:
-            team['schedule'] = [opponent.team_id for opponent in team['schedule']]
-            for i, opponent_id in enumerate(team['schedule']):
-                matchups.append({
-                    'year': self.year,
-                    'week': i+1,
-                    'team_id': team['team_id'],
-                    'points': team['scores'][i],
-                    'margin_of_victory': round(team['mov'][i], 2),
-                    'opponent_id': opponent_id
-                })
-        self.matchups = pd.DataFrame(matchups)
+            if key_map:
+                team_matchups = format_response(team, key_map)
+                team_matchups['schedule'] = [opponent.team_id for opponent in team['schedule']]
+        matchups = pd.DataFrame(matchups)
+        matchups['year'] = self.year
+        self.matchups = matchups
         return self.matchups
