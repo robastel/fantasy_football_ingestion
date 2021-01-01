@@ -1,7 +1,56 @@
-sleeper:
-  base_url: https://api.sleeper.app/v1
-  tables:
-    sleeper_seasons:
+sleeper_base_url: https://api.sleeper.app/v1
+espn_start_year: 2013
+espn_end_year: 2018
+
+args:
+  - definition: league_name
+    params:
+      help: The unique name of this league
+
+  - definition: sleeper_season_id
+    params:
+      help: The league ID of the most recent Sleeper season
+
+  - definition: gcs_bucket
+    params:
+      help: The Google Cloud Storage Bucket ID
+
+  - definition: gbq_project
+    params:
+      help: The Google BigQuery Project ID
+
+  - definition: gbq_dataset
+    params:
+      help: The Google BigQuery dataset to output tables to
+
+  - definition:
+      - -e
+      - --espn-league-id
+    params:
+      help: The ESPN league ID
+
+  - definition:
+      - -s
+      - --espn-s2
+    params:
+      help: The espn_s2 cookie
+
+  - definition:
+      - -w
+      - --espn-swid
+    params:
+      help: The ESPN swid cookie
+
+  - definition:
+      - -l
+      - --log-level
+    params:
+      default: INFO
+      help: A python logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+
+tables:
+  sleeper:
+    seasons:
       method: get_season
       key_map:
         league_id:
@@ -25,9 +74,9 @@ sleeper:
             data_type: INT64
             col_name: last_completed_week
           league_average_match:
-            data_type: BOOL
+            data_type: INT64
             col_name: has_matchup_against_median
-    sleeper_draft_picks:
+    draft_picks:
       method: get_draft_picks
       key_map:
         season_id:
@@ -51,7 +100,7 @@ sleeper:
           data_type: STRING
           col_name: user_id
         is_keeper:
-          data_type: BOOL
+          data_type: INT64
         metadata:
           first_name:
             data_type: STRING
@@ -62,12 +111,12 @@ sleeper:
           team:
             data_type: STRING
           years_exp:
-            data_type: INT64
+            data_type: STRING
           status:
             data_type: STRING
           injury_status:
             data_type: STRING
-    sleeper_rosters:
+    rosters:
       method: get_rosters
       key_map:
         season_id:
@@ -78,7 +127,7 @@ sleeper:
         owner_id:
           data_type: STRING
           col_name: user_id
-    sleeper_lookup_playoffs:
+    lookup_playoffs:
       method: get_winners_bracket
       key_map:
         season_id:
@@ -101,7 +150,7 @@ sleeper:
         l:
           data_type: INT64
           col_name: roster_id_loser
-    sleeper_matchups:
+    matchups:
       method: get_matchups
       key_map:
         season_id:
@@ -116,7 +165,7 @@ sleeper:
           data_type: FLOAT64
         custom_points:
           data_type: FLOAT64
-    sleeper_user_seasons:
+    user_seasons:
       method: get_users
       key_map:
         season_id:
@@ -125,13 +174,8 @@ sleeper:
           data_type: STRING
         display_name:
           data_type: STRING
-
-espn:
-  years:
-    start: 2013
-    end: 2018
-  tables:
-    espn_seasons:
+  espn:
+    seasons:
       method: get_season
       key_map:
         league_id:
@@ -152,13 +196,13 @@ espn:
             data_type: INT64
           playoff_team_count:
             data_type: INT64
-    espn_draft_picks:
+    draft_picks:
       method: get_draft_picks
       key_map:
-        year:
-          data_type: INT64
-        playerId:
+        season_id:
           data_type: STRING
+        playerId:
+          data_type: INT64
           col_name: player_id
         playerName:
           data_type: STRING
@@ -170,16 +214,16 @@ espn:
         bid_amount:
           data_type: INT64
         keeper_status:
-          data_type: BOOL
+          data_type: INT64
           col_name: is_keeper
         team:
           team_id:
             data_type: INT64
-    espn_teams:
+    teams:
       method: get_teams
       key_map:
-        year:
-          data_type: INT64
+        season_id:
+          data_type: STRING
         team_id:
           data_type: INT64
         owner:
@@ -199,19 +243,21 @@ espn:
         points_against:
           data_type: FLOAT64
           col_name: points_against_regular_season
-    espn_matchups:
+    matchups:
       method: get_matchups
       key_map:
-        year:
-          data_type: INT64
+        season_id:
+          data_type: STRING
         team_id:
           data_type: INT64
         schedule:
-          col_name: opponent_ids
-          data_type: ARRAY<INT64>
+          data_type: INT64
+          col_name: opponent_id
         scores:
-          data_type: ARRAY<FLOAT64>
+          data_type: FLOAT64
           col_name: points
         mov:
-          data_type: ARRAY<FLOAT64>
-          col_name: margins_of_victory
+          data_type: FLOAT64
+          col_name: margin_of_victory
+        week:
+          data_type: INT64

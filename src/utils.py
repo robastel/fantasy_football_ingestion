@@ -118,7 +118,7 @@ def _format_record(record, key_map):
     """
     formatted_record = dict()
     for k, v in key_map.items():
-        if record.get(k) is not None:
+        if k in record:
             _format_key(record, k, v, formatted_record)
     return formatted_record
 
@@ -147,5 +147,13 @@ def get_data_types(key_map, data_types=None):
             get_data_types(key_map[k], data_types=data_types)
         else:
             data_types[key_map[k].get('col_name', k)] = key_map[k]['data_type'].upper()
-    data_types = [bigquery.SchemaField(col_name, data_type) for col_name, data_type in data_types.items()]
+    # data_types = [
+    #     bigquery.SchemaField(
+    #         col_name,
+    #         data_type
+    #         # 'RECORD' if (is_record := data_type[:7].upper() == 'RECORD_') else data_type,
+    #         # mode=('REPEATED' if is_record else 'NULLABLE')
+    #     )
+    #     for col_name, data_type in data_types.items()
+    # ]
     return data_types

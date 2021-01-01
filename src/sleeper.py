@@ -6,15 +6,19 @@ BASE_URL = 'https://api.sleeper.app/v1'
 
 
 class SleeperSeason:
-    def __init__(self, season_id, base_url=BASE_URL):
+    def __init__(self, season_id, league_name, base_url=BASE_URL):
         """
         Initialize the SleeperSeason class
         :param season_id: The most recent league (a.k.a. season) ID (Sleeper uses a new league ID for each season).
                           The league ID can be found at the end of the league's website URL.
                           A "league" in Sleeper's nomenclature is actually a single season.
+        :param league_name: The name of the league to which season_id belongs
         :param base_url: The base URL of the Sleeper API
         """
         self.season_id = season_id
+        self.league_name = league_name
+        self.platform = 'sleeper'
+        self.year = None
         self.base_url = base_url
         self.previous_season_id = None
         self.draft_id = None
@@ -36,6 +40,7 @@ class SleeperSeason:
         """
         url = f'{self.base_url}/league/{self.season_id}'
         response = api_get_request(url)
+        self.year = int(response.get('season'))
         self.previous_season_id = response.get('previous_league_id')
         self.draft_id = response.get('draft_id')
         settings = response.get('settings', dict())
@@ -44,6 +49,7 @@ class SleeperSeason:
         if key_map:
             response = format_response(response, key_map)
         self.season = pd.DataFrame([response])
+        self.season['year'] = self.season['year'].astype(int)
         return self.season
 
     def get_draft_picks(self, key_map=None):
