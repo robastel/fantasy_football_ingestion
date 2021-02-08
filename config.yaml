@@ -53,6 +53,8 @@ tables:
     seasons:
       method: get_season
       key_map:
+        league_name:
+          data_type: STRING
         league_id:
           data_type: STRING
           col_name: season_id
@@ -178,10 +180,14 @@ tables:
     seasons:
       method: get_season
       key_map:
+        league_name:
+          data_type: STRING
         league_id:
           data_type: STRING
         year:
           data_type: INT64
+        season_id:
+          data_type: STRING
         firstScoringPeriod:
           data_type: INT64
           col_name: start_week

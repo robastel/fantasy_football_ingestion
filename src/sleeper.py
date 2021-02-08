@@ -50,6 +50,7 @@ class SleeperSeason:
             response = format_response(response, key_map)
         self.season = pd.DataFrame([response])
         self.season['year'] = self.season['year'].astype(int)
+        self.season['league_name'] = self.league_name
         return self.season
 
     def get_draft_picks(self, key_map=None):

@@ -5,8 +5,6 @@ import logging
 import argparse
 import yaml
 
-from google.cloud import bigquery
-
 
 def parse_args(args):
     """
@@ -147,13 +145,4 @@ def get_data_types(key_map, data_types=None):
             get_data_types(key_map[k], data_types=data_types)
         else:
             data_types[key_map[k].get('col_name', k)] = key_map[k]['data_type'].upper()
-    # data_types = [
-    #     bigquery.SchemaField(
-    #         col_name,
-    #         data_type
-    #         # 'RECORD' if (is_record := data_type[:7].upper() == 'RECORD_') else data_type,
-    #         # mode=('REPEATED' if is_record else 'NULLABLE')
-    #     )
-    #     for col_name, data_type in data_types.items()
-    # ]
     return data_types

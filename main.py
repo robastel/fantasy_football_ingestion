@@ -12,6 +12,7 @@ league_config = parse_yaml('config.yaml')
 class Main:
     def __init__(self, config):
         # Configurations
+        self.config = config
         self.tables_config = self.config.get('tables', dict())
         # Sleeper configurations
         self.sleeper_base_url = self.config.get('sleeper_base_url')

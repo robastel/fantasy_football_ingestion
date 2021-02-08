@@ -49,6 +49,7 @@ class ESPNSeason:
             response = format_response(response, key_map)
         self.season = pd.DataFrame([response])
         self.season['season_id'] = self.season_id
+        self.season['league_name'] = self.league_name
         return self.season
 
     def get_draft_picks(self, key_map=None):
