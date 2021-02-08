@@ -78,6 +78,9 @@ tables:
           league_average_match:
             data_type: INT64
             col_name: has_matchup_against_median
+          playoff_teams:
+            data_type: INT64
+            col_name: playoff_team_count
     draft_picks:
       method: get_draft_picks
       key_map:
