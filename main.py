@@ -1,4 +1,4 @@
-import pandas as pd
+import numpy as np
 from google.cloud import bigquery, storage
 import dask.dataframe as dd
 
@@ -81,11 +81,11 @@ class Main:
             method_name = table_config['method']
             method = season_obj.__getattribute__(method_name)
             df = method(key_map=table_config.get('key_map'))
-            df = df.replace('', pd.NA)
+            df = df.replace('', np.nan)
             dask_df = dd.from_pandas(df, npartitions=1)
             gcs_path = f'gs://{self.gcs_bucket}/{season_obj.platform}_{table}/{self.league_name}/{season_obj.season_id}'
             schema = get_data_types(table_config.get('key_map'))
-            dd.to_parquet(dask_df, path=gcs_path, write_index=False, overwrite=True, schema=schema)
+            dd.to_parquet(dask_df, path=gcs_path, write_index=False, overwrite=True, schema=schema, engine='pyarrow')
             self.logger.info(f'Extracted to {gcs_path}')
         self.logger.info(f'Finished extracting season "{season_obj.season_id}" from {season_obj.platform} to GCS\n')
 

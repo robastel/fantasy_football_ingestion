@@ -1,0 +1,15 @@
+version: '3'
+
+services:
+  fantasy_football:
+    build:
+      context: .
+    environment:
+      LEAGUE_NAME: tccc
+      SLEEPER_SEASON_ID: $SLEEPER_LEAGUE_ID
+      GCS_BUCKET: fantasy-football-landing
+      GBQ_PROJECT: robboli-broc
+      GBQ_DATASET: fantasy_football_landing
+      GOOGLE_APPLICATION_CREDENTIALS: $GOOGLE_APPLICATION_CREDENTIALS
+    volumes:
+      - $GOOGLE_APPLICATION_CREDENTIALS:$GOOGLE_APPLICATION_CREDENTIALS:ro
