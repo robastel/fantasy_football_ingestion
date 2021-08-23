@@ -3,6 +3,7 @@ import json
 import sys
 import logging
 import argparse
+
 import yaml
 
 
@@ -116,7 +117,7 @@ def _format_record(record, key_map):
     """
     formatted_record = dict()
     for k, v in key_map.items():
-        if record.get(k):
+        if k in record:
             _format_key(record, k, v, formatted_record)
     return formatted_record
 
@@ -134,4 +135,15 @@ def _format_key(record, key, value, formatted_record):
         for sub_key, sub_value in value.items():
             _format_key(sub_record, sub_key, sub_value, formatted_record)
     else:
-        formatted_record[value or key] = record.get(key)
+        formatted_record[value.get('col_name') or key] = record.get(key)
+
+
+def get_data_types(key_map, data_types=None):
+    if data_types is None:
+        data_types = dict()
+    for k in key_map:
+        if isinstance(key_map[k], dict) and not key_map[k].get('data_type'):
+            get_data_types(key_map[k], data_types=data_types)
+        else:
+            data_types[key_map[k].get('col_name', k)] = key_map[k]['data_type'].upper()
+    return data_types

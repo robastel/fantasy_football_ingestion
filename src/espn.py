@@ -6,18 +6,22 @@ from src.utils import format_response
 
 
 class ESPNSeason:
-    def __init__(self, league_id, s2, swid, year):
+    def __init__(self, league_id, league_name, s2, swid, year):
         """
         Initialize the ESPNSeason class
         :param league_id: The ESPN league ID for which this season is a part of
+        :param league_name: The name of the league to which this season belongs
         :param s2: Your ESPN s2 cookie (used for authentication)
         :param swid: Your ESPN swid cookie (used for authentication)
         :param year: The year of the season
         """
         self.league_id = league_id
+        self.league_name = league_name
+        self.platform = 'espn'
         self.s2 = s2
         self.swid = swid
         self.year = year
+        self.season_id = f'{self.league_id}_{self.year}'
         self.season = None
         self.start_week = None
         self.regular_season_weeks = None
@@ -44,6 +48,8 @@ class ESPNSeason:
         if key_map:
             response = format_response(response, key_map)
         self.season = pd.DataFrame([response])
+        self.season['season_id'] = self.season_id
+        self.season['league_name'] = self.league_name
         return self.season
 
     def get_draft_picks(self, key_map=None):
@@ -57,7 +63,7 @@ class ESPNSeason:
         if key_map:
             self.draft_picks = format_response(self.draft_picks, key_map)
         self.draft_picks = pd.DataFrame(self.draft_picks)
-        self.draft_picks['year'] = self.year
+        self.draft_picks['season_id'] = self.season_id
         return self.draft_picks
 
     def get_teams(self, key_map=None):
@@ -69,25 +75,20 @@ class ESPNSeason:
         if key_map:
             self.teams = format_response(self.team_objs, key_map)
         self.teams = pd.DataFrame(self.teams)
-        self.teams['year'] = self.year
+        self.teams['season_id'] = self.season_id
         return self.teams
 
-    def get_matchups(self, **kwargs):
+    def get_matchups(self, key_map=None):
         """
         Parse the matchups for the season
         :return: A DataFrame representing the matchups
         """
-        matchups = list()
         for team in self.team_objs:
             team['schedule'] = [opponent.team_id for opponent in team['schedule']]
-            for i, opponent_id in enumerate(team['schedule']):
-                matchups.append({
-                    'year': self.year,
-                    'week': i+1,
-                    'team_id': team['team_id'],
-                    'points': team['scores'][i],
-                    'margin_of_victory': round(team['mov'][i], 2),
-                    'opponent_id': opponent_id
-                })
-        self.matchups = pd.DataFrame(matchups)
+            team['week'] = [i+1 for i in range(len(team['schedule']))]
+        matchups = format_response(self.team_objs, key_map)
+        matchups = pd.DataFrame(matchups)
+        matchups = matchups.apply(pd.Series.explode)
+        matchups['season_id'] = self.season_id
+        self.matchups = matchups
         return self.matchups
