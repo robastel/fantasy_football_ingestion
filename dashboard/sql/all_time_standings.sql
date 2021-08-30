@@ -8,13 +8,8 @@ WITH records_with_rank AS
         , FORMAT("%'.3f", made_playoffs_rate) AS made_playoffs_rate
         , FORMAT("%'.3f", regular_season_win_rate) AS regular_season_win_rate
         , season_count
-        , RANK() OVER(ORDER BY
-            first_place_count DESC
-            , second_place_count DESC
-            , third_place_count DESC
-          ) AS all_time_rank
     FROM
-        `robboli-broc.dbt.records`
+        robboli-broc.fantasy_football.managers
 )
 
 SELECT
