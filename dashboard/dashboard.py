@@ -41,8 +41,8 @@ class AllTimeStandings(Charter):
             "\U0001F947",
             "\U0001F948",
             "\U0001F949",
-            "Reg. Season Win Rate",
             "Made Playoffs Rate",
+            "Reg. Season Win Rate",
             "Seasons Played",
         ]
         df = df.astype(str)

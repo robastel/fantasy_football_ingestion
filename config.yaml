@@ -216,6 +216,8 @@ tables:
         playerName:
           data_type: STRING
           col_name: player_name
+        position:
+          data_type: STRING
         round_num:
           data_type: INT64
         round_pick:

@@ -22,6 +22,7 @@ class ESPNSeason:
         self.swid = swid
         self.year = year
         self.season_id = f'{self.league_id}_{self.year}'
+        self.response = None
         self.season = None
         self.start_week = None
         self.regular_season_weeks = None
@@ -37,17 +38,17 @@ class ESPNSeason:
         :param key_map: A dictionary representing the values to be parsed from the API response
         :return: A DataFrame representing the season
         """
-        response = League(league_id=self.league_id, year=self.year, espn_s2=self.s2, swid=self.swid)
-        response = vars(response)
-        response['settings'] = vars(response['settings'])
-        self.start_week = response.get('firstScoringPeriod', 1)
-        self.regular_season_weeks = response['settings'].get('reg_season_count')
-        self.team_objs = [vars(team) for team in response['teams']]
-        self.draft_picks = [vars(pick) for pick in response['draft']]
-        self.player_map = response['player_map']
+        self.response = League(league_id=self.league_id, year=self.year, espn_s2=self.s2, swid=self.swid)
+        self.response = vars(self.response)
+        self.response['settings'] = vars(self.response['settings'])
+        self.start_week = self.response.get('firstScoringPeriod', 1)
+        self.regular_season_weeks = self.response['settings'].get('reg_season_count')
+        self.team_objs = [vars(team) for team in self.response['teams']]
+        self.draft_picks = [vars(pick) for pick in self.response['draft']]
+        self.player_map = self.response['player_map']
         if key_map:
-            response = format_response(response, key_map)
-        self.season = pd.DataFrame([response])
+            self.response = format_response(self.response, key_map)
+        self.season = pd.DataFrame([self.response])
         self.season['season_id'] = self.season_id
         self.season['league_name'] = self.league_name
         return self.season
@@ -63,6 +64,10 @@ class ESPNSeason:
         if key_map:
             self.draft_picks = format_response(self.draft_picks, key_map)
         self.draft_picks = pd.DataFrame(self.draft_picks)
+        self.draft_picks['position'] = self.draft_picks['player_id'].apply(
+            lambda x: self.response.player_info(playerId=x).position,
+            axis=1,
+        )
         self.draft_picks['season_id'] = self.season_id
         return self.draft_picks
 
