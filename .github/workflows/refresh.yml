@@ -17,6 +17,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+      - name: Set up Google Application Credentials
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          project_id: ${{ secrets.GBQ_PROJECT }}
+          service_account_key: ${{ secrets.APPLICATION_CREDENTIALS }}
+          export_default_credentials: true
       - name: Refresh data
         env:
           LEAGUE_NAME: ${{ secrets.LEAGUE_NAME }}
@@ -24,8 +30,5 @@ jobs:
           GCS_BUCKET: ${{ secrets.GCS_BUCKET }}
           GBQ_PROJECT: ${{ secrets.GBQ_PROJECT }}
           GBQ_DATASET: ${{ secrets.GBQ_DATASET }}
-          APPLICATION_CREDENTIALS: ${{ secrets.APPLICATION_CREDENTIALS }}
-          GOOGLE_APPLICATION_CREDENTIALS: ${HOME}/service-key.json
         run: |
-          base64 -d $APPLICATION_CREDENTIALS > $GOOGLE_APPLICATION_CREDENTIALS
           python main.py $LEAGUE_NAME $SLEEPER_SEASON_ID $GCS_BUCKET $GBQ_PROJECT $GBQ_DATASET
