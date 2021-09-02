@@ -25,7 +25,7 @@ jobs:
           GBQ_PROJECT: ${{ secrets.GBQ_PROJECT }}
           GBQ_DATASET: ${{ secrets.GBQ_DATASET }}
           APPLICATION_CREDENTIALS: ${{ secrets.APPLICATION_CREDENTIALS }}
-          GOOGLE_APPLICATION_CREDENTIALS: ${HOME}/service-key.json
+          GOOGLE_APPLICATION_CREDENTIALS: $HOME/service-key.json
         run: |
           base64 -d $APPLICATION_CREDENTIALS > $GOOGLE_APPLICATION_CREDENTIALS
           python main.py $LEAGUE_NAME $SLEEPER_SEASON_ID $GCS_BUCKET $GBQ_PROJECT $GBQ_DATASET
