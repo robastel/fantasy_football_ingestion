@@ -156,7 +156,7 @@ def _format_key(record, key, value, formatted_record):
         renamed according to the key_map from _format_record
     :return: None
     """
-    if isinstance((sub_record := record[key]), dict):
+    if isinstance((sub_record := record.get(key)), dict):
         for sub_key, sub_value in value.items():
             _format_key(sub_record, sub_key, sub_value, formatted_record)
     else:
