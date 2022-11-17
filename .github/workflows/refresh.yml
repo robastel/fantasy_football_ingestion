@@ -18,7 +18,7 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
       - name: Set up Google Application Credentials
-        uses: google-github-actions/setup-gcloud@master
+        uses: google-github-actions/setup-gcloud@main
         with:
           project_id: ${{ secrets.GBQ_PROJECT }}
           service_account_key: ${{ secrets.APPLICATION_CREDENTIALS }}
