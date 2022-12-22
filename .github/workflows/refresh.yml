@@ -8,21 +8,28 @@ jobs:
   refresh:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+      
       - name: Set up Python
-        uses: actions/setup-python@v2
+        uses: actions/setup-python@v4
         with:
           python-version: 3.8
+      
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+      
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v1
+        with:
+          credentials_json: ${{ secrets.APPLICATION_CREDENTIALS }}
+      
       - name: Set up Google Application Credentials
-        uses: google-github-actions/setup-gcloud@main
+        uses: google-github-actions/setup-gcloud@v1
         with:
           project_id: ${{ secrets.GBQ_PROJECT }}
-          service_account_key: ${{ secrets.APPLICATION_CREDENTIALS }}
-          export_default_credentials: true
+
       - name: Refresh data
         env:
           LEAGUE_NAME: ${{ secrets.LEAGUE_NAME }}
